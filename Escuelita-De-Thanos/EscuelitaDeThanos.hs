@@ -9,7 +9,7 @@ data Personaje = Personaje {
     habilidades :: [String],
     nombre :: String,
     planeta :: String
-} deriving(Show)
+} deriving(Show,Eq)
 
 type Universo = [Personaje]
 
@@ -23,7 +23,7 @@ guanteDeThanos = Guante {
 ironMan :: Personaje
 ironMan = Personaje {
     edad = 48,
-    energia = 8000.0,
+    energia = 80.0,
     habilidades = ["Ingeniería", "Combate cuerpo a cuerpo", "Armadura avanzada"],
     nombre = "Tony Stark",
     planeta = "Tierra"
@@ -32,7 +32,7 @@ ironMan = Personaje {
 captainAmerica :: Personaje
 captainAmerica = Personaje {
     edad = 100,  -- Edad real incluyendo el tiempo en congelación
-    energia = 7000.0,
+    energia = 70.0,
     habilidades = ["Super fuerza", "Agilidad", "Uso del escudo"],
     nombre = "Steve Rogers",
     planeta = "Tierra"
@@ -41,7 +41,7 @@ captainAmerica = Personaje {
 thor :: Personaje
 thor = Personaje {
     edad = 1500,
-    energia = 9000.0,
+    energia = 90.0,
     habilidades = ["Control del trueno", "Super fuerza", "Vuelo", "Uso del Mjolnir"],
     nombre = "Thor",
     planeta = "Asgard"
@@ -50,7 +50,7 @@ thor = Personaje {
 blackWidow :: Personaje
 blackWidow = Personaje {
     edad = 35,
-    energia = 6000.0,
+    energia = 60.0,
     habilidades = ["Artes marciales", "Espionaje", "Uso de armas"],
     nombre = "Natasha Romanoff",
     planeta = "Tierra"
@@ -59,7 +59,7 @@ blackWidow = Personaje {
 hulk :: Personaje
 hulk = Personaje {
     edad = 45,
-    energia = 10000.0,
+    energia = 100.0,
     habilidades = ["Super fuerza", "Regeneración", "Invulnerabilidad"],
     nombre = "Bruce Banner",
     planeta = "Tierra"
@@ -67,8 +67,8 @@ hulk = Personaje {
 
 spiderMan :: Personaje
 spiderMan = Personaje {
-    edad = 18,
-    energia = 6500.0,
+    edad = 22,
+    energia = 65.0,
     habilidades = ["Trepar paredes", "Sentido arácnido", "Super agilidad", "Lanzar telarañas"],
     nombre = "Peter Parker",
     planeta = "Tierra"
@@ -77,7 +77,7 @@ spiderMan = Personaje {
 scarletWitch :: Personaje
 scarletWitch = Personaje {
     edad = 29,
-    energia = 9000.0,
+    energia = 90.0,
     habilidades = ["Magia del caos"],
     nombre = "Wanda Maximoff",
     planeta = "Tierra"
@@ -115,10 +115,7 @@ type Gema = Personaje -> Personaje
 dado.
     ● El alma puede controlar el alma de nuestro oponente permitiéndole eliminar una
 habilidad en particular si es que la posee. Además le quita 10 puntos de energía.
-1 No se deje intimidar por la prosa, estamos resolviendo un parcial al fin de cuentas y lo que importa
-es modelar lo que hacen las gemas.
-1
-Parcial Funcional 2019 - Escuelita de Thanos
+
 Paradigmas de Programación
     ● El espacio que permite transportar al rival al planeta x (el que usted decida) y resta
 20 puntos de energía.
@@ -135,5 +132,72 @@ contra un rival.
 Punto 3: (3 puntos) Implementar las gemas del infinito, evitando lógica duplicada.
 -}
 
---laMente :: Float -> Gema
---laMente valor unPersonaje = unPesonaje { energia = energia - energia * (valor/100) } 
+laMente :: Float -> Gema
+laMente valor unPersonaje = unPersonaje { energia = reducirEnergia (energia unPersonaje * (valor/100)) unPersonaje }
+
+elAlma :: String -> Gema
+elAlma unaHabilidad unPersonaje = unPersonaje { habilidades = filter (/= unaHabilidad) (habilidades unPersonaje) , energia = reducirEnergia 10 unPersonaje }
+
+elEspacio :: String -> Gema
+elEspacio unPlaneta unPersonaje = unPersonaje { planeta = unPlaneta, energia = reducirEnergia 20 unPersonaje }
+
+elPoder :: Gema
+elPoder unPersonaje
+    | ((<=2).length.habilidades $ unPersonaje) = unPersonaje { habilidades = [], energia = reducirEnergia (energia unPersonaje) unPersonaje }
+    | otherwise = unPersonaje { energia = 0}
+
+elTiempo :: Gema
+elTiempo unPersonaje
+    | (div (edad unPersonaje) 2) > 18 = unPersonaje { edad = div (edad unPersonaje) 2, energia = reducirEnergia 50 unPersonaje} 
+    | otherwise = unPersonaje { edad = 18, energia = reducirEnergia 50 unPersonaje }
+
+gemaLoca :: Gema -> Gema 
+
+gemaLoca unaGema unPersonaje = unaGema.unaGema $ unPersonaje
+
+-- extraccion de logica
+reducirEnergia :: Float -> Personaje -> Float 
+reducirEnergia valor unPersonaje = energia unPersonaje - valor
+
+guanteleteDeGoma :: Guante
+guanteleteDeGoma = Guante {
+    material = "goma",
+    gemas = [elTiempo, elAlma "usar Mjolnir", gemaLoca (elAlma "programacion enHaskell")]
+
+}
+
+--Punto 5
+usarGemas :: [Gema] -> Personaje -> Personaje
+usarGemas unasGemas unPersonaje = foldr ($) unPersonaje unasGemas
+
+{- Ejemplo de uso
+ghci> spiderMan
+Personaje {edad = 22, energia = 65.0, habilidades = ["Trepar paredes","Sentido ar\225cnido","Super agilidad","Lanzar telara\241as"], nombre = "Peter Parker", planeta = "Tierra"}
+
+ghci> usarGemas [elTiempo, elAlma "Super agilidad", elPoder, elEspacio "Neptuno"] spiderMan
+Personaje {edad = 18, energia = -60.0, habilidades = ["Trepar paredes","Sentido ar\225cnido","Lanzar telara\241as"], nombre = "Peter Parker", planeta = "Neptuno"}
+-}
+
+guanteleteDePruebas :: Guante
+guanteleteDePruebas = Guante {
+    material = "uru",
+    gemas = [elTiempo, elAlma "Super agilidad", elPoder, elEspacio "Neptuno"]
+}
+
+--Punto 6
+-- Función recursiva para encontrar la gema más poderosa  !! ANALIZAR FUNCION
+gemaMasPoderosaAux :: [Gema] -> Personaje -> Gema -> Gema
+gemaMasPoderosaAux [] _ gemaMasPoderosaActual = gemaMasPoderosaActual
+gemaMasPoderosaAux (g:gs) unPersonaje gemaMasPoderosaActual
+    | energia (g unPersonaje) < energia (gemaMasPoderosaActual unPersonaje) = gemaMasPoderosaAux gs unPersonaje g
+    | otherwise = gemaMasPoderosaAux gs unPersonaje gemaMasPoderosaActual
+
+-- Función principal
+gemaMasPoderosa :: Guante -> Personaje -> Gema
+gemaMasPoderosa unGuante _ = error "El guantelete no tiene gemas"
+gemaMasPoderosa unGuante unPersonaje = gemaMasPoderosaAux (gemas unGuante) unPersonaje (head (gemas unGuante))
+
+-- 7
+{-
+Realizar
+-}
