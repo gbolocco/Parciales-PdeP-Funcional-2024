@@ -12,30 +12,52 @@ data Personaje = Personaje {
 }
 
 -- personajes
-aku :: Personaje
-aku = Personaje {
+
+jack :: Personaje
+jack = Personaje {
+    nombre = "jack",
+    salud = 300,
+    elementos = [concentracion 3, katanaMagica],
+    anioPresente = 200 
+}
+
+aku :: Int -> Float -> Personaje
+aku unAnio unaSalud = Personaje {
     nombre = "Aku",
-    salud = 100,
-    elementos = [espadaMagica, espadaMaligna],
-    anioPresente = 2024
+    salud = unaSalud,
+    elementos = [concentracion 4, portalAlFuturo unAnio] ++ esbirrosMalvados (unAnio*100),
+    anioPresente = unAnio
 }
 
 -- elementos
 
-espadaMaligna :: Elemento
-espadaMaligna = Elemento {
+concentracion :: Int -> Elemento
+concentracion nivel = Elemento {
+    tipo = "magia",
+    ataque = id,
+    defensa = meditaciones nivel
+}
+
+esbirroMalvado :: Elemento
+esbirroMalvado = Elemento {
     tipo = "maldad",
-    ataque = (causarDanio 20),
-    defensa = meditar
-}
-espadaMagica :: Elemento
-espadaMagica = Elemento {
-    tipo = "acero",
-    ataque = (causarDanio 10),
-    defensa = meditar
+    ataque = (causarDanio 1),
+    defensa = id
 }
 
+katanaMagica :: Elemento
+katanaMagica = Elemento {
+    tipo = "magia",
+    ataque = (causarDanio 1000),
+    defensa = id
+}
 
+portalAlFuturo :: Int -> Elemento
+portalAlFuturo unAnio = Elemento {
+    tipo = "magia",
+    ataque = mandarAlAnio (unAnio + 2800),
+    defensa = generarNuevoAku (unAnio + 2800)
+}
 
 ----------------------------------------
 
@@ -77,7 +99,7 @@ aplicar el efecto de ataque del elemento, el personaje queda con salud igual a 0
 -}
 
 esMalvado :: Personaje -> Bool
-esMalvado unPersonaje = any (== "maldad") (map tipo (elementos aku))
+esMalvado unPersonaje = any (== "maldad") (map tipo (elementos unPersonaje))
 
 danioQueProduce :: Personaje -> Elemento -> Float
 danioQueProduce unPersonaje unElemento = salud unPersonaje - (salud.(ataque unElemento)  $ unPersonaje)
@@ -111,9 +133,37 @@ poseeUnElementoMortal unPersonaje unEnemigo =  any (==0) (map salud (map ($ unPe
                 que tenga el personaje al usar el portal.
 -}
 
-concentracion :: Int -> Elemento
-concentracion nivel = Elemento {
-    tipo = "magia",
-    ataque = (causarDanio 1000),
-    defensa = meditar
+-- Aplico recursividad
+
+meditaciones :: Int -> (Personaje -> Personaje)
+meditaciones 0 = id
+meditaciones nivel = meditar . meditaciones (nivel-1)
+
+esbirrosMalvados :: Int -> [Elemento]
+esbirrosMalvados cantidad = replicate cantidad esbirroMalvado
+
+{--}
+
+generarNuevoAku :: Int -> Personaje -> Personaje
+generarNuevoAku unAnio akuActual = Personaje {
+    nombre = "Aku",
+    salud = salud akuActual,
+    elementos = [concentracion 4, portalAlFuturo unAnio] ++ esbirrosMalvados (unAnio*100),
+    anioPresente = unAnio 
 }
+
+
+{-
+4. Finalmente queremos saber cómo puede concluir la lucha entre Jack y Aku. Para ello hay
+que definir la función luchar :: Personaje -> Personaje -> (Personaje, Personaje) donde
+se espera que si el primer personaje (el atacante) está muerto, retorne la tupla con el
+defensor primero y el atacante después, en caso contrario la lucha continuará
+invirtiéndose los papeles (el atacante será el próximo defensor) luego de que ambos
+personajes se vean afectados por el uso de todos los elementos del atacante.
+-}
+
+luchar :: Personaje -> Personaje -> (Personaje, Personaje)
+luchar atacante defensor = salud (foldr ($) defensor (aplicarAtaques atacante))
+
+aplicarAtaques :: Personaje -> [Personaje -> Personaje]
+aplicarAtaques unPersonaje = map ataque (elementos unPersonaje)

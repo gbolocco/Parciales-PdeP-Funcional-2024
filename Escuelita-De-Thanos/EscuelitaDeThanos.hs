@@ -144,7 +144,7 @@ elEspacio unPlaneta unPersonaje = unPersonaje { planeta = unPlaneta, energia = r
 elPoder :: Gema
 elPoder unPersonaje
     | ((<=2).length.habilidades $ unPersonaje) = unPersonaje { habilidades = [], energia = reducirEnergia (energia unPersonaje) unPersonaje }
-    | otherwise = unPersonaje { energia = 0}
+    | otherwise = unPersonaje { energia = reducirEnergia (energia unPersonaje) unPersonaje }
 
 elTiempo :: Gema
 elTiempo unPersonaje
