@@ -162,8 +162,8 @@ invirtiéndose los papeles (el atacante será el próximo defensor) luego de que
 personajes se vean afectados por el uso de todos los elementos del atacante.
 -}
 
-luchar :: Personaje -> Personaje -> (Personaje, Personaje)
-luchar atacante defensor = salud (foldr ($) defensor (aplicarAtaques atacante))
+--luchar :: Personaje -> Personaje -> (Personaje, Personaje)
+--luchar atacante defensor = salud (foldr ($) defensor (aplicarAtaques atacante))
 
 aplicarAtaques :: Personaje -> [Personaje -> Personaje]
 aplicarAtaques unPersonaje = map ataque (elementos unPersonaje)

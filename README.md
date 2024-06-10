@@ -15,3 +15,9 @@ sinRepetidos [] = []
 sinRepetidos (x:xs)
     | elem x xs = sinRepetidos xs
     | otherwise = x : sinRepetidos xs
+
+*Funcion que ordena una lista de elementos bajo un criterio especifico*
+
+quickSort :: (a -> a -> Bool) -> [a] -> [a]
+quickSort _ [] = []
+quickSort criterio (x:xs) = (quickSort criterio . filter (not . criterio x)) xs ++ [x] ++ (quickSort criterio . filter (criterio x)) xs
