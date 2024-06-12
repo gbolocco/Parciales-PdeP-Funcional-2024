@@ -41,7 +41,12 @@ dichas funciones tienen que ir de tipoElemento -> tipoElemento
 foldr ($) elemento [funciones]
 foldl (flip $) elemento [funciones]
 
-*Aplicar un ekemento a una lista de funciones, me devuelve una lista con las funciones aplicadas al elemento*
+*Aplicar un elemento a una lista de funciones, me devuelve una lista con las funciones aplicadas al elemento*
 
 aplicar :: a -> [a -> a] -> [a]
 aplicar elemento funciones = map ($ elemento) funciones
+
+*Aplicar una lista de funciones a una lista de elementos y me devuelve la lista de elementos afectado por todas las funciones*
+
+explorar :: [numero] -> [funcion] -> [Investigador]
+explorar listaDeNumeros funciones =  map (\x -> foldr ($) x funciones) listaDeNumeros
