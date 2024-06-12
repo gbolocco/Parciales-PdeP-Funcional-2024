@@ -38,8 +38,8 @@ inflingirDaño persona daño = persona{salud = max 0 (salud unPersonaje - daño)
 
 dichas funciones tienen que ir de tipoElemento -> tipoElemento
 
-foldr ($) elemento [funciones]
-foldl (flip $) elemento [funciones]
+foldr ('$') elemento [funciones]
+foldl (flip '$') elemento [funciones]
 
 **Aplicar un elemento a una lista de funciones, me devuelve una lista con las funciones aplicadas al elemento**
 
