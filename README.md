@@ -10,13 +10,13 @@ import Data.List (sort)
 
 **Funciones Clave:**
 
-*Funcion para encontrar un elemento en una lista de tuplas*
+**Funcion para encontrar un elemento en una lista de tuplas**
 
 [("nombre",elemento)]
 encontrar :: String -> [lista de tuplas] -> elemento
 encontrar elemento listaDeElementos = head . filter ((==elemento).fst) $ listaDeElementos
 
-*Funcion que elimina los elementos repetidos dentro de una lista*
+**Funcion que elimina los elementos repetidos dentro de una lista**
 
 sinRepetidos :: Eq a => [a] -> [a]
 sinRepetidos [] = []
@@ -24,29 +24,29 @@ sinRepetidos (x:xs)
     | elem x xs = sinRepetidos xs
     | otherwise = x : sinRepetidos xs
 
-*Funcion que ordena una lista de elementos bajo un criterio especifico*
+**Funcion que ordena una lista de elementos bajo un criterio especifico**
 
 quickSort :: (a -> a -> Bool) -> [a] -> [a]
 quickSort _ [] = []
 quickSort criterio (x:xs) = (quickSort criterio . filter (not . criterio x)) xs ++ [x] ++ (quickSort criterio . filter (criterio x)) xs
 
-*Funcion para restriccion de valores*
+**Funcion para restriccion de valores**
 
 inflingirDaño persona daño = persona{salud = max 0 (salud unPersonaje - daño)} --la salud no puede ser menor que 0
 
-*Aplicar una lista de funciones a un elemento*
+**Aplicar una lista de funciones a un elemento**
 
 dichas funciones tienen que ir de tipoElemento -> tipoElemento
 
 foldr ($) elemento [funciones]
 foldl (flip $) elemento [funciones]
 
-*Aplicar un elemento a una lista de funciones, me devuelve una lista con las funciones aplicadas al elemento*
+**Aplicar un elemento a una lista de funciones, me devuelve una lista con las funciones aplicadas al elemento**
 
 aplicar :: a -> [a -> a] -> [a]
 aplicar elemento funciones = map ($ elemento) funciones
 
-*Aplicar una lista de funciones a una lista de elementos y me devuelve la lista de elementos afectado por todas las funciones*
+**Aplicar una lista de funciones a una lista de elementos y me devuelve la lista de elementos afectado por todas las funciones**
 
 explorar :: [numero] -> [funcion] -> [Investigador]
 explorar listaDeNumeros funciones =  map (\x -> foldr ($) x funciones) listaDeNumeros
